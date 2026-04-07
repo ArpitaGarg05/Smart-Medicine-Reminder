@@ -3,7 +3,7 @@ from .models import Reminder
 from datetime import time, date
 from reminders.models import Reminder
 
-TIME_MAP = {1: [time(9, 0)], 2: [time(9, 0), time(21, 0)], 3: [time(8, 0), time(14, 0), time(20, 0)]}
+TIME_MAP = {1: [time(9, 0)], 2: [time(9, 0), time(20, 0)], 3: [time(8, 0), time(14, 0), time(20, 0)]}
 
 
 def generate_today_reminders(user):

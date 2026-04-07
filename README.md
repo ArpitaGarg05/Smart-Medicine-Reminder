@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Smart Medicine Reminder App
 Complete Django web app for prescription OCR, AI parsing, medicine confirmation, reminders, and stock alerts.
 ## Features
@@ -34,3 +35,7 @@ Complete Django web app for prescription OCR, AI parsing, medicine confirmation,
 - AI output is **never auto-saved** as medicines.
 - User must confirm and submit editable rows.
 - OCR/AI failures are handled with user-facing error messages.
+=======
+# smart_medicine_reminder
+This web app helps users manage daily medicines easily. Users can add prescriptions, set reminders, and track whether medicines are taken on time. It also allows sharing details with family or caregivers. The app helps avoid missed doses and keeps everything organized for better health and consistency in daily routines.
+>>>>>>> aa088919951e186646e6beed9beb6ad7928c167e

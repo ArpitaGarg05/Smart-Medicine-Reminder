@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="max-w-6xl mx-auto animate-fade-in-up">
+    
+    <!-- HEADER -->
+    <div class="mb-10">
+        <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center shadow-sm hover:scale-110 transition">
+                👨‍👩‍👧
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900">Family Sharing</h2>
+        </div>
+        <p class="text-gray-500 text-sm">Manage access to your medicines and shared dashboards</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- LEFT -->
+        <div class="space-y-6">
+
+            <!-- ADD CAREGIVER -->
+            <div class="bg-white rounded-2xl shadow border hover:shadow-lg transition">
+
+                <div class="px-6 py-4 border-b bg-gray-50">
+                    <h3 class="font-bold text-gray-800">Add Caregiver</h3>
+                </div>
+
+                <form method="post" class="p-6 space-y-4" id="caregiver-form">
+                    {% csrf_token %}
+
+                    <div class="django-form-wrapper">
+                        {{ form.as_p }}
+                    </div>
+
+                    <button type="submit" id="submitBtn"
+                        class="w-full py-2.5 bg-blue-500 text-white rounded-xl font-bold hover:bg-blue-600 transition flex justify-center items-center gap-2">
+
+                        <span id="btnText">Add Caregiver</span>
+
+                        <svg id="loader" class="w-4 h-4 hidden animate-spin" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="white" stroke-width="4" fill="none"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+
+            <!-- MY CAREGIVERS -->
+            <div class="bg-white rounded-2xl shadow border hover:shadow-lg transition">
+
+                <div class="px-6 py-4 border-b bg-gray-50">
+                    <h3 class="font-bold text-gray-800">People With Access</h3>
+                </div>
+
+                <ul class="divide-y">
+
+                    {% for access in my_caregivers %}
+                    <li class="p-5 flex justify-between items-center hover:bg-gray-50 transition group">
+
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-blue-100 text-primary rounded-full flex items-center justify-center font-bold">
+                                {{ access.caregiver.username|first|upper }}
+                            </div>
+
+                            <div>
+                                <p class="font-bold">{{ access.caregiver.username }}</p>
+                                <p class="text-sm text-gray-500">{{ access.caregiver.email }}</p>
+                            </div>
+                        </div>
+
+                        <form method="post" action="{% url 'revoke_caregiver' access.id %}">
+                            {% csrf_token %}
+                            <button type="submit"
+                                class="px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-500 hover:text-white transition">
+                                Remove
+                            </button>
+                        </form>
+
+                    </li>
+
+                    {% empty %}
+                    <li class="p-8 text-center text-gray-500">
+                        No caregivers yet
+                    </li>
+                    {% endfor %}
+
+                </ul>
+            </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="bg-white rounded-2xl shadow border hover:shadow-lg transition">
+
+            <div class="px-6 py-4 border-b bg-gray-50">
+                <h3 class="font-bold text-gray-800">Shared With You</h3>
+            </div>
+
+            <ul class="divide-y">
+
+                {% for access in shared_with_me %}
+                <li class="p-5 flex justify-between items-center hover:bg-gray-50 transition">
+
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-100 text-secondary rounded-full flex items-center justify-center font-bold">
+                            {{ access.owner.username|first|upper }}
+                        </div>
+
+                        <p class="font-bold">{{ access.owner.username }}</p>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <a href="{% url 'shared_dashboard' access.owner.id %}"
+                           class="px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 transition text-sm">
+                            Dashboard
+                        </a>
+
+                        <a href="{% url 'shared_medicines_list' access.owner.id %}"
+                           class="px-3 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-500 hover:text-white transition text-sm">
+                            Medicines
+                        </a>
+                    </div>
+
+                </li>
+
+                {% empty %}
+                <li class="p-8 text-center text-gray-500">
+                    Nothing shared with you
+                </li>
+                {% endfor %}
+
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<!-- JS -->
+<script>
+// loading animation
+document.getElementById("caregiver-form").addEventListener("submit", function () {
+    document.getElementById("btnText").innerText = "Adding...";
+    document.getElementById("loader").classList.remove("hidden");
+});
+</script>
+
+<style>
+.animate-fade-in-up {
+    animation: fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+{% endblock %}

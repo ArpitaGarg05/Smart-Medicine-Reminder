@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="max-w-2xl mx-auto animate-fade-in-up">
+
+    <!-- HEADER -->
+    <div class="mb-10 text-center flex flex-col items-center">
+        <div class="w-16 h-16 bg-blue-100 text-primary rounded-2xl flex items-center justify-center mb-4 shadow-sm hover:scale-110 transition duration-300">
+            ✏️
+        </div>
+
+        <h2 class="text-3xl font-bold text-gray-900 tracking-tight">
+            Edit Medicine
+        </h2>
+
+        <p class="text-gray-500 mt-2 text-sm">
+            Update dosage, timing, or schedule.
+        </p>
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="bg-white rounded-2xl shadow-lg border overflow-hidden hover:shadow-xl transition duration-300">
+
+        <form method="post" class="p-8 space-y-6" id="edit-form">
+            {% csrf_token %}
+
+            <div class="django-form-wrapper space-y-5">
+                {{ form.as_p }}
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="pt-6 border-t flex justify-end gap-3">
+
+                <a href="{% url 'dashboard' %}" 
+                   class="px-6 py-3 border text-gray-600 rounded-xl font-semibold hover:bg-gray-100 transition">
+                    Cancel
+                </a>
+
+                <button type="submit" id="submitBtn"
+                    class="flex items-center gap-2 px-8 py-3 rounded-xl text-white bg-blue-500 hover:bg-blue-600 transition shadow hover:scale-105 active:scale-95">
+
+                    <span id="btnText">Save Changes</span>
+
+                    <svg id="loader" class="w-4 h-4 hidden animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                              d="M4 12a8 8 0 018-8v8z"></path>
+                    </svg>
+                </button>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- JS -->
+<script>
+document.getElementById("edit-form").addEventListener("submit", function () {
+    const btn = document.getElementById("submitBtn");
+    const text = document.getElementById("btnText");
+    const loader = document.getElementById("loader");
+
+    text.innerText = "Saving...";
+    loader.classList.remove("hidden");
+    btn.disabled = true;
+});
+</script>
+
+<!-- STYLES -->
+<style>
+.django-form-wrapper p {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.25rem;
+}
+
+/* LABEL */
+.django-form-wrapper label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #374151;
+}
+
+/* INPUT */
+.django-form-wrapper input,
+.django-form-wrapper select,
+.django-form-wrapper textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    transition: all 0.3s ease;
+}
+
+/* FOCUS EFFECT */
+.django-form-wrapper input:focus,
+.django-form-wrapper select:focus,
+.django-form-wrapper textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+/* ERROR */
+.errorlist {
+    color: red;
+    font-size: 13px;
+}
+
+/* ANIMATION */
+.animate-fade-in-up {
+    animation: fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="max-w-5xl mx-auto animate-fade-in-up">
+
+    <!-- HEADER -->
+    <div class="mb-10 flex items-center gap-4">
+        <div class="w-12 h-12 bg-gray-900 text-white rounded-xl flex items-center justify-center shadow-md">
+            💻
+        </div>
+        <div>
+            <h2 class="text-3xl font-bold text-gray-900">Parsed Debug Logs</h2>
+            <p class="text-gray-500 text-sm">OCR output + AI structured data</p>
+        </div>
+    </div>
+
+    <div class="space-y-8">
+
+        <!-- RAW TEXT -->
+        <div class="bg-white rounded-2xl shadow border overflow-hidden group">
+
+            <div class="px-6 py-4 bg-gray-50 border-b flex justify-between items-center">
+                <h3 class="text-sm font-bold text-gray-700 uppercase">Raw Extracted Text</h3>
+
+                <button onclick="copyText('rawText')" 
+                    class="text-xs px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition">
+                    Copy
+                </button>
+            </div>
+
+            <div class="p-6 bg-slate-900 overflow-x-auto relative">
+                <pre id="rawText" class="text-sm font-mono text-green-400 leading-relaxed whitespace-pre-wrap terminal-text">
+{{ prescription.extracted_text }}
+                </pre>
+            </div>
+        </div>
+
+        <!-- AI DATA -->
+        <div class="bg-white rounded-2xl shadow border overflow-hidden group">
+
+            <div class="px-6 py-4 bg-gray-50 border-b flex justify-between items-center">
+                <h3 class="text-sm font-bold text-gray-700 uppercase">AI Parsed JSON</h3>
+
+                <button onclick="copyText('aiData')" 
+                    class="text-xs px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition">
+                    Copy
+                </button>
+            </div>
+
+            <div class="p-6 bg-slate-900 overflow-x-auto relative">
+                <pre id="aiData" class="text-sm font-mono text-blue-400 leading-relaxed whitespace-pre-wrap terminal-text">
+{{ prescription.ai_parsed_data }}
+                </pre>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BACK BUTTON -->
+    <div class="mt-10 flex justify-center">
+        <a href="{% url 'dashboard' %}" 
+           class="px-6 py-3 bg-white border rounded-xl hover:bg-gray-100 transition shadow">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+</div>
+
+<!-- JS -->
+<script>
+// copy function
+function copyText(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text);
+
+    alert("Copied!");
+}
+
+// typing animation
+document.querySelectorAll(".terminal-text").forEach((el) => {
+    const text = el.innerText;
+    el.innerText = "";
+    let i = 0;
+
+    function type() {
+        if (i < text.length) {
+            el.innerText += text.charAt(i);
+            i++;
+            setTimeout(type, 5);
+        }
+    }
+
+    type();
+});
+</script>
+
+<!-- STYLES -->
+<style>
+.animate-fade-in-up {
+    animation: fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* terminal glow */
+pre {
+    text-shadow: 0 0 5px rgba(0,255,100,0.3);
+}
+</style>
+
+{% endblock %}

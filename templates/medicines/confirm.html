@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="max-w-7xl mx-auto animate-fade-in-up">
+    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-3 mb-2">
+                <div class="w-10 h-10 bg-blue-100 text-primary rounded-xl flex items-center justify-center shadow-sm">
+                    📋
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 tracking-tight">Confirm Medicines</h2>
+            </div>
+            <p class="text-gray-500 font-medium">Review, edit, and confirm the extracted details before saving.</p>
+        </div>
+    </div>
+
+    <form method="post" id="confirm-form" class="space-y-6">
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                        <tr>
+                            <th class="px-4 py-3">Medicine</th>
+                            <th class="px-4 py-3">Dosage</th>
+                            <th class="px-4 py-3">Freq</th>
+                            <th class="px-4 py-3">Timing</th>
+                            <th class="px-4 py-3">Qty</th>
+                            <th class="px-4 py-3 text-center">Delete</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="form-table" class="divide-y">
+                        {% for form in formset %}
+                        <tr class="hover:bg-blue-50 transition">
+                            <td class="px-4 py-3">{{ form.name }}</td>
+                            <td class="px-4 py-3">{{ form.dosage }}</td>
+                            <td class="px-4 py-3">{{ form.frequency_per_day }}</td>
+                            <td class="px-4 py-3">{{ form.timing }}</td>
+                            <td class="px-4 py-3">{{ form.total_quantity }}</td>
+
+                            <td class="px-4 py-3 text-center">
+                                <label class="relative cursor-pointer">
+                                    {{ form.delete }}
+
+                                    <div onclick="deleteRow(this)" 
+                                        class="w-8 h-8 mx-auto rounded-lg bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition">
+                                        🗑️
+                                    </div>
+                                </label>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ACTION BAR -->
+            <div class="flex justify-between items-center p-4 bg-gray-50">
+
+                <!-- ADD ROW -->
+                <button type="button" onclick="addRow()" 
+                    class="px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition">
+                    + Add Medicine
+                </button>
+
+                <!-- SUBMIT -->
+                <button type="submit"
+                    class="px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition shadow">
+                    Confirm and Save
+                </button>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- JS -->
+<script>
+function deleteRow(btn) {
+    const row = btn.closest("tr");
+
+    row.style.transition = "all 0.3s ease";
+    row.style.opacity = "0";
+    row.style.transform = "translateX(20px)";
+
+    setTimeout(() => {
+        const checkbox = row.querySelector("input[type='checkbox']");
+        if (checkbox) checkbox.checked = true;
+        row.style.display = "none";
+    }, 300);
+}
+
+function addRow() {
+    const table = document.querySelector("#form-table");
+    const totalForms = document.querySelector("#id_form-TOTAL_FORMS");
+
+    let formCount = parseInt(totalForms.value);
+
+    const newRow = table.rows[0].cloneNode(true);
+
+    newRow.querySelectorAll("input, select").forEach(el => {
+        if (el.type !== "checkbox") {
+            el.value = "";
+        } else {
+            el.checked = false;
+        }
+
+        if (el.name) {
+            el.name = el.name.replace(/\d+/, formCount);
+            el.id = el.id.replace(/\d+/, formCount);
+        }
+    });
+
+    newRow.style.opacity = "0";
+    newRow.style.transform = "translateY(10px)";
+
+    table.appendChild(newRow);
+
+    setTimeout(() => {
+        newRow.style.transition = "all 0.3s ease";
+        newRow.style.opacity = "1";
+        newRow.style.transform = "translateY(0)";
+    }, 10);
+
+    totalForms.value = formCount + 1;
+}
+</script>
+
+<style>
+#confirm-form input,
+#confirm-form select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #f9fafb;
+}
+
+#confirm-form input:focus {
+    border-color: #2563eb;
+    background: white;
+}
+
+/* hide checkbox */
+#confirm-form input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+}
+</style>
+
+{% endblock %}

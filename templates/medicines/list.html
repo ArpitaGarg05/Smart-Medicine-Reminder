@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="max-w-7xl mx-auto animate-fade-in-up">
+
+    <!-- HEADER -->
+    <div class="mb-10 flex justify-between items-center">
+        <div>
+            <h2 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                💊 
+                {% if can_edit %}
+                    My Medicines
+                {% else %}
+                    {{ target_user.username }}'s Medicines
+                {% endif %}
+            </h2>
+            <p class="text-gray-500 text-sm mt-1">Manage your medicines and stock</p>
+        </div>
+
+        {% if can_edit %}
+        <a href="{% url 'medicine_add' %}" 
+           class="px-5 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition shadow hover:scale-105">
+            + Add
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-white rounded-2xl shadow border overflow-hidden">
+
+        <table class="w-full text-left">
+            <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
+                <tr>
+                    <th class="px-6 py-3">Name</th>
+                    <th class="px-6 py-3">Dosage</th>
+                    <th class="px-6 py-3">Freq</th>
+                    <th class="px-6 py-3">Timing</th>
+                    <th class="px-6 py-3">Stock</th>
+                    {% if can_edit %}
+                    <th class="px-6 py-3 text-right">Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for med in medicines %}
+                <tr class="border-t hover:bg-blue-50 transition group">
+
+                    <!-- NAME -->
+                    <td class="px-6 py-4 font-bold">{{ med.name }}</td>
+
+                    <!-- DOSAGE -->
+                    <td class="px-6 py-4 text-gray-600">{{ med.dosage }}</td>
+
+                    <!-- FREQUENCY -->
+                    <td class="px-6 py-4">
+                        <span class="bg-gray-100 px-2 py-1 rounded text-xs font-bold">
+                            {{ med.frequency_per_day }}x
+                        </span>
+                    </td>
+
+                    <!-- TIMING -->
+                    <td class="px-6 py-4 text-gray-600">{{ med.timing }}</td>
+
+                    <!-- STOCK -->
+                    <td class="px-6 py-4 w-64">
+                        
+                        <div class="flex flex-col gap-1">
+
+                            <!-- PROGRESS BAR -->
+                            <div class="flex items-center gap-2 w-full">
+
+                                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+
+                                    <div class="h-2 rounded-full transition-all duration-700 ease-out
+                                        {% if med.stock_percentage < 30 %}
+                                            bg-red-500 animate-pulse
+                                        {% elif med.stock_percentage < 60 %}
+                                            bg-yellow-400
+                                        {% else %}
+                                            bg-green-500
+                                        {% endif %}"
+                                        style="width: 0%"
+                                        data-width="{{ med.stock_percentage }}">
+                                    </div>
+
+                                </div>
+
+                                <span class="text-xs font-bold whitespace-nowrap
+                                    {% if med.stock_percentage < 30 %}
+                                        text-red-600
+                                    {% elif med.stock_percentage < 60 %}
+                                        text-yellow-600
+                                    {% else %}
+                                        text-green-600
+                                    {% endif %}">
+                                    {{ med.remaining_quantity }}/{{ med.total_quantity }}
+                                </span>
+
+                            </div>
+
+                            <!-- LOW STOCK WARNING -->
+                            {% if med.stock_percentage < 30 %}
+                            <div class="text-xs text-red-600 font-semibold flex items-center gap-1 animate-pulse">
+                                ⚠ Low stock! Refill soon
+                            </div>
+                            {% endif %}
+
+                        </div>
+
+                    </td>
+
+                    {% if can_edit %}
+                    <td class="px-6 py-4 text-right flex gap-2 justify-end">
+
+                        <!-- EDIT -->
+                        <a href="{% url 'medicine_edit' med.id %}" 
+                           class="px-3 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-500 hover:text-white transition">
+                            Edit
+                        </a>
+
+                        <!-- DELETE -->
+                        <form method="post" action="{% url 'medicine_delete' med.id %}" onsubmit="return confirmDelete()" class="m-0">
+                            {% csrf_token %}
+                            <button type="submit"
+                                class="px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-500 hover:text-white transition">
+                                Delete
+                            </button>
+                        </form>
+
+                    </td>
+                    {% endif %}
+
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-12 text-gray-500">
+                        📦 No medicines added yet
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- JS -->
+<script>
+// confirm delete
+function confirmDelete() {
+    return confirm("Are you sure you want to delete this medicine?");
+}
+
+// animate progress bars
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("[data-width]").forEach((bar, i) => {
+        const width = bar.getAttribute("data-width");
+
+        setTimeout(() => {
+            bar.style.width = width + "%";
+        }, i * 100);
+    });
+});
+</script>
+
+<style>
+/* page animation */
+.animate-fade-in-up {
+    animation: fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+
+{% endblock %}

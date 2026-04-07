@@ -13,7 +13,7 @@ Complete Django web app for prescription OCR, AI parsing, medicine confirmation,
 1. Install dependencies:
    - `pip install -r requirements.txt`
 2. Set Gemini API key:
-   - Windows PowerShell: `$env:GEMINI_API_KEY="AIzaSyASsC3-D9pJzxmmexos6C5EyCPAMcSriVo"`
+   - Windows PowerShell: ``
 3. Install Tesseract OCR engine on your system and ensure `tesseract` is available in PATH.
 4. Run migrations:
    - `python manage.py makemigrations`
